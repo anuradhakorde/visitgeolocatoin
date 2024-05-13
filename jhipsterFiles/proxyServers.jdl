@@ -1,0 +1,13 @@
+
+entity ProxyServers {
+    ipAddress String
+    port Integer
+    country String
+    protocol String
+    anonymity String
+    organization String
+    speed Integer
+    responseTime Integer
+    successCount Integer
+    failCount Integer
+}

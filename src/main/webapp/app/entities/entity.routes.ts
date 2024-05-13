@@ -6,6 +6,11 @@ const routes: Routes = [
     data: { pageTitle: 'visitGeoLocationApp.adminAuthority.home.title' },
     loadChildren: () => import('./admin/authority/authority.routes'),
   },
+  {
+    path: 'proxy-servers',
+    data: { pageTitle: 'visitGeoLocationApp.proxyServers.home.title' },
+    loadChildren: () => import('./proxy-servers/proxy-servers.routes'),
+  },
   /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
 ];
 

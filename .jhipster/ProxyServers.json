@@ -1,0 +1,51 @@
+{
+  "annotations": {
+    "changelogDate": "20240513104726"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "ipAddress",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "port",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "country",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "protocol",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "anonymity",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "organization",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "speed",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "responseTime",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "successCount",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "failCount",
+      "fieldType": "Integer"
+    }
+  ],
+  "name": "ProxyServers",
+  "relationships": [],
+  "searchEngine": "no"
+}

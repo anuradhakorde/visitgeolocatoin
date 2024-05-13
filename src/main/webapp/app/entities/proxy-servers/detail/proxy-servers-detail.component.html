@@ -1,0 +1,72 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (proxyServers()) {
+      <div>
+        <h2 data-cy="proxyServersDetailsHeading">
+          <span jhiTranslate="visitGeoLocationApp.proxyServers.detail.title">Proxy Servers</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="visitGeoLocationApp.proxyServers.ipAddress">Ip Address</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.ipAddress }}</span>
+          </dd>
+          <dt><span jhiTranslate="visitGeoLocationApp.proxyServers.port">Port</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.port }}</span>
+          </dd>
+          <dt><span jhiTranslate="visitGeoLocationApp.proxyServers.country">Country</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.country }}</span>
+          </dd>
+          <dt><span jhiTranslate="visitGeoLocationApp.proxyServers.protocol">Protocol</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.protocol }}</span>
+          </dd>
+          <dt><span jhiTranslate="visitGeoLocationApp.proxyServers.anonymity">Anonymity</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.anonymity }}</span>
+          </dd>
+          <dt><span jhiTranslate="visitGeoLocationApp.proxyServers.organization">Organization</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.organization }}</span>
+          </dd>
+          <dt><span jhiTranslate="visitGeoLocationApp.proxyServers.speed">Speed</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.speed }}</span>
+          </dd>
+          <dt><span jhiTranslate="visitGeoLocationApp.proxyServers.responseTime">Response Time</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.responseTime }}</span>
+          </dd>
+          <dt><span jhiTranslate="visitGeoLocationApp.proxyServers.successCount">Success Count</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.successCount }}</span>
+          </dd>
+          <dt><span jhiTranslate="visitGeoLocationApp.proxyServers.failCount">Fail Count</span></dt>
+          <dd>
+            <span>{{ proxyServers()!.failCount }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/proxy-servers', proxyServers()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

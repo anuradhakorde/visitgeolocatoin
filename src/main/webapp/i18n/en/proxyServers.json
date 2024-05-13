@@ -1,0 +1,33 @@
+{
+  "visitGeoLocationApp": {
+    "proxyServers": {
+      "home": {
+        "title": "Proxy Servers",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Proxy Servers",
+        "createOrEditLabel": "Create or edit a Proxy Servers",
+        "notFound": "No Proxy Servers found"
+      },
+      "created": "A new Proxy Servers is created with identifier {{ param }}",
+      "updated": "A Proxy Servers is updated with identifier {{ param }}",
+      "deleted": "A Proxy Servers is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Proxy Servers {{ id }}?"
+      },
+      "detail": {
+        "title": "Proxy Servers"
+      },
+      "id": "ID",
+      "ipAddress": "Ip Address",
+      "port": "Port",
+      "country": "Country",
+      "protocol": "Protocol",
+      "anonymity": "Anonymity",
+      "organization": "Organization",
+      "speed": "Speed",
+      "responseTime": "Response Time",
+      "successCount": "Success Count",
+      "failCount": "Fail Count"
+    }
+  }
+}

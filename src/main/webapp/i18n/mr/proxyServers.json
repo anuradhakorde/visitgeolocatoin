@@ -1,0 +1,33 @@
+{
+  "visitGeoLocationApp": {
+    "proxyServers": {
+      "home": {
+        "title": "Proxy Servers",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "नवीन Proxy Servers तयार करा",
+        "createOrEditLabel": "Proxy Servers तयार किंवा संपादित करा",
+        "notFound": "No Proxy Servers found"
+      },
+      "created": "Proxy Servers [identifier: {{ param }}] तयार आहे",
+      "updated": "Proxy Servers [identifier: {{ param }}] सुधारित केले आहे",
+      "deleted": "Proxy Servers [identifier: {{ param }}] हटविले आहे",
+      "delete": {
+        "question": "Proxy Servers [id: {{ id }}] काढून टाकण्याबाबत पुष्टी?"
+      },
+      "detail": {
+        "title": "Proxy Servers"
+      },
+      "id": "ID",
+      "ipAddress": "Ip Address",
+      "port": "Port",
+      "country": "Country",
+      "protocol": "Protocol",
+      "anonymity": "Anonymity",
+      "organization": "Organization",
+      "speed": "Speed",
+      "responseTime": "Response Time",
+      "successCount": "Success Count",
+      "failCount": "Fail Count"
+    }
+  }
+}
