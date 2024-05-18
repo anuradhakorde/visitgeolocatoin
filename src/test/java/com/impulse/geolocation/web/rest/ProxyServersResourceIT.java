@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.impulse.geolocation.IntegrationTest;
 import com.impulse.geolocation.domain.ProxyServers;
 import com.impulse.geolocation.repository.ProxyServersRepository;
+import com.impulse.geolocation.service.dto.ProxyServersDTO;
+import com.impulse.geolocation.service.mapper.ProxyServersMapper;
 import jakarta.persistence.EntityManager;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -74,6 +76,9 @@ class ProxyServersResourceIT {
     private ProxyServersRepository proxyServersRepository;
 
     @Autowired
+    private ProxyServersMapper proxyServersMapper;
+
+    @Autowired
     private EntityManager em;
 
     @Autowired
@@ -133,18 +138,20 @@ class ProxyServersResourceIT {
     void createProxyServers() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the ProxyServers
-        var returnedProxyServers = om.readValue(
+        ProxyServersDTO proxyServersDTO = proxyServersMapper.toDto(proxyServers);
+        var returnedProxyServersDTO = om.readValue(
             restProxyServersMockMvc
-                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(proxyServers)))
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(proxyServersDTO)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
-            ProxyServers.class
+            ProxyServersDTO.class
         );
 
         // Validate the ProxyServers in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedProxyServers = proxyServersMapper.toEntity(returnedProxyServersDTO);
         assertProxyServersUpdatableFieldsEquals(returnedProxyServers, getPersistedProxyServers(returnedProxyServers));
     }
 
@@ -153,12 +160,13 @@ class ProxyServersResourceIT {
     void createProxyServersWithExistingId() throws Exception {
         // Create the ProxyServers with an existing ID
         proxyServers.setId(1L);
+        ProxyServersDTO proxyServersDTO = proxyServersMapper.toDto(proxyServers);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restProxyServersMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(proxyServers)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(proxyServersDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the ProxyServers in the database
@@ -243,12 +251,13 @@ class ProxyServersResourceIT {
             .responseTime(UPDATED_RESPONSE_TIME)
             .successCount(UPDATED_SUCCESS_COUNT)
             .failCount(UPDATED_FAIL_COUNT);
+        ProxyServersDTO proxyServersDTO = proxyServersMapper.toDto(updatedProxyServers);
 
         restProxyServersMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedProxyServers.getId())
+                put(ENTITY_API_URL_ID, proxyServersDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(updatedProxyServers))
+                    .content(om.writeValueAsBytes(proxyServersDTO))
             )
             .andExpect(status().isOk());
 
@@ -263,12 +272,15 @@ class ProxyServersResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         proxyServers.setId(longCount.incrementAndGet());
 
+        // Create the ProxyServers
+        ProxyServersDTO proxyServersDTO = proxyServersMapper.toDto(proxyServers);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restProxyServersMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, proxyServers.getId())
+                put(ENTITY_API_URL_ID, proxyServersDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(proxyServers))
+                    .content(om.writeValueAsBytes(proxyServersDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -282,12 +294,15 @@ class ProxyServersResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         proxyServers.setId(longCount.incrementAndGet());
 
+        // Create the ProxyServers
+        ProxyServersDTO proxyServersDTO = proxyServersMapper.toDto(proxyServers);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProxyServersMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(proxyServers))
+                    .content(om.writeValueAsBytes(proxyServersDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -301,9 +316,12 @@ class ProxyServersResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         proxyServers.setId(longCount.incrementAndGet());
 
+        // Create the ProxyServers
+        ProxyServersDTO proxyServersDTO = proxyServersMapper.toDto(proxyServers);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProxyServersMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(proxyServers)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(proxyServersDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ProxyServers in the database
@@ -389,12 +407,15 @@ class ProxyServersResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         proxyServers.setId(longCount.incrementAndGet());
 
+        // Create the ProxyServers
+        ProxyServersDTO proxyServersDTO = proxyServersMapper.toDto(proxyServers);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restProxyServersMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, proxyServers.getId())
+                patch(ENTITY_API_URL_ID, proxyServersDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(proxyServers))
+                    .content(om.writeValueAsBytes(proxyServersDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -408,12 +429,15 @@ class ProxyServersResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         proxyServers.setId(longCount.incrementAndGet());
 
+        // Create the ProxyServers
+        ProxyServersDTO proxyServersDTO = proxyServersMapper.toDto(proxyServers);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProxyServersMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(proxyServers))
+                    .content(om.writeValueAsBytes(proxyServersDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -427,9 +451,12 @@ class ProxyServersResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         proxyServers.setId(longCount.incrementAndGet());
 
+        // Create the ProxyServers
+        ProxyServersDTO proxyServersDTO = proxyServersMapper.toDto(proxyServers);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProxyServersMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(proxyServers)))
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(proxyServersDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ProxyServers in the database

@@ -3,6 +3,7 @@
     "changelogDate": "20240513104726"
   },
   "applications": "*",
+  "dto": "mapstruct",
   "fields": [
     {
       "fieldName": "ipAddress",
@@ -46,6 +47,8 @@
     }
   ],
   "name": "ProxyServers",
+  "pagination": "infinite-scroll",
   "relationships": [],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceClass"
 }

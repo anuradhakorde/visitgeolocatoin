@@ -11,3 +11,6 @@ entity ProxyServers {
     successCount Integer
     failCount Integer
 }
+dto ProxyServers with mapstruct
+paginate ProxyServers with infinite-scroll
+service ProxyServers with serviceClass

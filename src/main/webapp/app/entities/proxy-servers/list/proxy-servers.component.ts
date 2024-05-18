@@ -1,4 +1,5 @@
-import { Component, NgZone, inject, OnInit } from '@angular/core';
+import { Component, computed, NgZone, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { combineLatest, filter, Observable, Subscription, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -7,10 +8,14 @@ import SharedModule from 'app/shared/shared.module';
 import { sortStateSignal, SortDirective, SortByDirective, type SortState, SortService } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
 import { FormsModule } from '@angular/forms';
+
+import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { SORT, ITEM_DELETED_EVENT, DEFAULT_SORT_DATA } from 'app/config/navigation.constants';
-import { IProxyServers } from '../proxy-servers.model';
+import { ParseLinks } from 'app/core/util/parse-links.service';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { EntityArrayResponseType, ProxyServersService } from '../service/proxy-servers.service';
 import { ProxyServersDeleteDialogComponent } from '../delete/proxy-servers-delete-dialog.component';
+import { IProxyServers } from '../proxy-servers.model';
 
 @Component({
   standalone: true,
@@ -25,6 +30,7 @@ import { ProxyServersDeleteDialogComponent } from '../delete/proxy-servers-delet
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
+    InfiniteScrollModule,
   ],
 })
 export class ProxyServersComponent implements OnInit {
@@ -34,10 +40,16 @@ export class ProxyServersComponent implements OnInit {
 
   sortState = sortStateSignal({});
 
+  itemsPerPage = ITEMS_PER_PAGE;
+  links: WritableSignal<{ [key: string]: undefined | { [key: string]: string | undefined } }> = signal({});
+  hasMorePage = computed(() => !!this.links().next);
+  isFirstFetch = computed(() => Object.keys(this.links()).length === 0);
+
   public router = inject(Router);
   protected proxyServersService = inject(ProxyServersService);
   protected activatedRoute = inject(ActivatedRoute);
   protected sortService = inject(SortService);
+  protected parseLinks = inject(ParseLinks);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
@@ -47,13 +59,18 @@ export class ProxyServersComponent implements OnInit {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
         tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => {
-          if (!this.proxyServers || this.proxyServers.length === 0) {
-            this.load();
-          }
-        }),
+        tap(() => this.reset()),
+        tap(() => this.load()),
       )
       .subscribe();
+  }
+
+  reset(): void {
+    this.proxyServers = [];
+  }
+
+  loadNextPage(): void {
+    this.load();
   }
 
   delete(proxyServers: IProxyServers): void {
@@ -85,28 +102,53 @@ export class ProxyServersComponent implements OnInit {
   }
 
   protected onResponseSuccess(response: EntityArrayResponseType): void {
+    this.fillComponentAttributesFromResponseHeader(response.headers);
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    this.proxyServers = this.refineData(dataFromBody);
-  }
-
-  protected refineData(data: IProxyServers[]): IProxyServers[] {
-    const { predicate, order } = this.sortState();
-    return predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
+    this.proxyServers = dataFromBody;
   }
 
   protected fillComponentAttributesFromResponseBody(data: IProxyServers[] | null): IProxyServers[] {
+    // If there is previous link, data is a infinite scroll pagination content.
+    if (this.links().prev) {
+      const proxyServersNew = this.proxyServers ?? [];
+      if (data) {
+        for (const d of data) {
+          if (proxyServersNew.map(op => op.id).indexOf(d.id) === -1) {
+            proxyServersNew.push(d);
+          }
+        }
+      }
+      return proxyServersNew;
+    }
     return data ?? [];
+  }
+
+  protected fillComponentAttributesFromResponseHeader(headers: HttpHeaders): void {
+    const linkHeader = headers.get('link');
+    if (linkHeader) {
+      this.links.set(this.parseLinks.parseAll(linkHeader));
+    } else {
+      this.links.set({});
+    }
   }
 
   protected queryBackend(): Observable<EntityArrayResponseType> {
     this.isLoading = true;
     const queryObject: any = {
-      sort: this.sortService.buildSortParam(this.sortState()),
+      size: this.itemsPerPage,
     };
+    if (this.hasMorePage()) {
+      Object.assign(queryObject, this.links().next);
+    } else if (this.isFirstFetch()) {
+      Object.assign(queryObject, { sort: this.sortService.buildSortParam(this.sortState()) });
+    }
+
     return this.proxyServersService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
   protected handleNavigation(sortState: SortState): void {
+    this.links.set({});
+
     const queryParamsObj = {
       sort: this.sortService.buildSortParam(sortState),
     };
